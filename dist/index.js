@@ -1,6 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.scrollToBottom = exports.enableGADebug = exports.previewGTM = exports.restoreSessionCookies = exports.saveSessionCookies = exports.fetchJsonFromGlitch = exports.saveJsonToGlitch = exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatRequestUrl = void 0;
+exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatRequestUrl = void 0;
+exports.saveJsonToGlitch = saveJsonToGlitch;
+exports.fetchJsonFromGlitch = fetchJsonFromGlitch;
+exports.saveSessionCookies = saveSessionCookies;
+exports.restoreSessionCookies = restoreSessionCookies;
+exports.previewGTM = previewGTM;
+exports.enableGADebug = enableGADebug;
+exports.scrollToBottom = scrollToBottom;
 const axios_1 = require("axios");
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
@@ -8,7 +15,7 @@ const axios_1 = require("axios");
 /**
  * Returns a flattened request URL by combining the URL and postData parameters
  * of the given Request object.
- * @param {Request} req The Request object containing the URL and postData.
+ * @param {Request | Request2} req The Request object containing the URL and postData.
  * @return {*}  {string} A string representing the flattened request URL.
  */
 const flatRequestUrl = (req) => {
@@ -91,11 +98,9 @@ async function saveJsonToGlitch(key, data, expires) {
         expires,
     });
 }
-exports.saveJsonToGlitch = saveJsonToGlitch;
 async function fetchJsonFromGlitch(key) {
     return (await axios_1.default.get(`https://lourenco-json-storage.glitch.me/${key}`)).data;
 }
-exports.fetchJsonFromGlitch = fetchJsonFromGlitch;
 /**
  * Salva os cookies do contexto no Glitch.
  *
@@ -122,7 +127,6 @@ async function saveSessionCookies(context, key, expires) {
         await saveJsonToGlitch(key, cookies, expires);
     }
 }
-exports.saveSessionCookies = saveSessionCookies;
 /**
  * Restaura, no contexto do browser, os cookies previamente salvos no Glitch.
  *
@@ -150,7 +154,6 @@ async function restoreSessionCookies(context, key) {
     }
     return false;
 }
-exports.restoreSessionCookies = restoreSessionCookies;
 /*************************************************************
  ********* Guarda/restaura cookies no Glitch - end ***********
  *************************************************************/
@@ -176,7 +179,6 @@ async function previewGTM(context, tagAssistantUrl) {
         url: `https://www.googletagmanager.com/gtm.js?id=${containerId}&gtm_auth=${gtm_auth}&gtm_preview=${gtm_preview}&cb=${Date.now()}`,
     }));
 }
-exports.previewGTM = previewGTM;
 /**
  * Simula a extensão Google Analytics Debugger (https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna),
  * habilitando debug de GA3 (analytics.js) e GA4 (gtag).
@@ -199,7 +201,6 @@ async function enableGADebug(context) {
         },
     ]);
 }
-exports.enableGADebug = enableGADebug;
 /**
  * Realiza scroll até o fundo da página, suavemente.
  */
@@ -213,5 +214,4 @@ async function scrollToBottom({ page, timeToWaitAfterScroll = 0, returnToTop = t
     if (timeToWaitAfterScroll > 0)
         await page.waitForTimeout(timeToWaitAfterScroll);
 }
-exports.scrollToBottom = scrollToBottom;
 //# sourceMappingURL=index.js.map

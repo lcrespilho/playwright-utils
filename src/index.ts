@@ -1,4 +1,5 @@
 import type { Request, Response, BrowserContext, Page } from '@playwright/test'
+import type { Request as Request2 } from 'playwright'
 import axios from 'axios'
 
 /*************************************************************
@@ -8,10 +9,10 @@ import axios from 'axios'
 /**
  * Returns a flattened request URL by combining the URL and postData parameters
  * of the given Request object.
- * @param {Request} req The Request object containing the URL and postData.
+ * @param {Request | Request2} req The Request object containing the URL and postData.
  * @return {*}  {string} A string representing the flattened request URL.
  */
-export const flatRequestUrl = (req: Request): string => {
+export const flatRequestUrl = (req: Request | Request2): string => {
   const url = req.url()
   const body = req.postData() || ''
   if (!body) return url
@@ -27,7 +28,7 @@ export const flatRequestUrl = (req: Request): string => {
  * request is matched by the pattern.
  * @param pattern - pattern to match the request URL.
  */
-export const requestMatcher = (pattern: RegExp | string) => (req: Request) =>
+export const requestMatcher = (pattern: RegExp | string) => (req: Request | Request2) =>
   typeof pattern === 'string' ? flatRequestUrl(req).includes(pattern) : pattern.test(flatRequestUrl(req))
 
 /**
@@ -47,7 +48,7 @@ export const responseMatcher = (pattern: RegExp | string) => (res: Response) =>
  * @param pattern - pattern to match the request URL.
  * @param cb - Callback function that will be executed after if the request is matched.
  */
-export const requestMatcherCb = (pattern: RegExp | string, cb: (req: Request) => void) => (req: Request) => {
+export const requestMatcherCb = (pattern: RegExp | string, cb: (req: Request | Request2) => void) => (req: Request | Request2) => {
   if (requestMatcher(pattern)(req)) {
     try {
       cb(req)

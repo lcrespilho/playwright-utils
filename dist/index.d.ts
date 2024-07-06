@@ -1,20 +1,21 @@
 import type { Request, Response, BrowserContext, Page } from '@playwright/test';
+import type { Request as Request2 } from 'playwright';
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
  *************************************************************/
 /**
  * Returns a flattened request URL by combining the URL and postData parameters
  * of the given Request object.
- * @param {Request} req The Request object containing the URL and postData.
+ * @param {Request | Request2} req The Request object containing the URL and postData.
  * @return {*}  {string} A string representing the flattened request URL.
  */
-export declare const flatRequestUrl: (req: Request) => string;
+export declare const flatRequestUrl: (req: Request | Request2) => string;
 /**
  * Accepts a pattern, and returns a function that returns true if a
  * request is matched by the pattern.
  * @param pattern - pattern to match the request URL.
  */
-export declare const requestMatcher: (pattern: RegExp | string) => (req: Request) => boolean;
+export declare const requestMatcher: (pattern: RegExp | string) => (req: Request | Request2) => boolean;
 /**
  * Accepts a pattern, and returns a function that returns true if a
  * response is matched by the pattern.
@@ -28,7 +29,7 @@ export declare const responseMatcher: (pattern: RegExp | string) => (res: Respon
  * @param pattern - pattern to match the request URL.
  * @param cb - Callback function that will be executed after if the request is matched.
  */
-export declare const requestMatcherCb: (pattern: RegExp | string, cb: (req: Request) => void) => (req: Request) => boolean;
+export declare const requestMatcherCb: (pattern: RegExp | string, cb: (req: Request | Request2) => void) => (req: Request | Request2) => boolean;
 /**
  * Accepts a pattern and a callback function, and returns a function that
  * returns true if a response is matched by the pattern, and executes the

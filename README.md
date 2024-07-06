@@ -52,7 +52,7 @@ of the given Request object.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Request</code> | The Request object containing the URL and postData. |
+| req | <code>Request</code> \| <code>Request2</code> | The Request object containing the URL and postData. |
 
 <a name="requestMatcher"></a>
 

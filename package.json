@@ -1,6 +1,6 @@
 {
   "name": "@lcrespilho/playwright-utils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Coleção de funções utilitárias que utilizo frequentemente com o Playwright",
   "repository": {
     "type": "git",
@@ -20,12 +20,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@playwright/test": "^1.43.1",
-    "axios": "^1.6.8"
+    "@playwright/test": "^1.45.1",
+    "axios": "^1.7.2",
+    "playwright": "^1.45.1"
   },
   "devDependencies": {
-    "@types/node": "^20.12.8",
+    "@types/node": "^20.14.0",
     "jsdoc-to-markdown": "^8.0.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.3"
   }
 }
