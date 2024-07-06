@@ -15,7 +15,7 @@ const axios_1 = require("axios");
 /**
  * Returns a flattened request URL by combining the URL and postData parameters
  * of the given Request object.
- * @param {Request | Request2} req The Request object containing the URL and postData.
+ * @param {Request} req The Request object containing the URL and postData.
  * @return {*}  {string} A string representing the flattened request URL.
  */
 const flatRequestUrl = (req) => {
@@ -31,6 +31,14 @@ const flatRequestUrl = (req) => {
 };
 exports.flatRequestUrl = flatRequestUrl;
 /**
+ * Returns a flattened request URL from Response object, by combining the URL and postData
+ * parameters of the given Response's Request object.
+ *
+ * @param {Response} res A Response object
+ * @return {*}  {string} A string representing the flattened request URL.
+ */
+const flatResponseUrl = (res) => (0, exports.flatRequestUrl)(res.request());
+/**
  * Accepts a pattern, and returns a function that returns true if a
  * request is matched by the pattern.
  * @param pattern - pattern to match the request URL.
@@ -43,8 +51,8 @@ exports.requestMatcher = requestMatcher;
  * @param pattern - pattern to match the response URL.
  */
 const responseMatcher = (pattern) => (res) => typeof pattern === 'string'
-    ? (0, exports.flatRequestUrl)(res.request()).includes(pattern)
-    : pattern.test((0, exports.flatRequestUrl)(res.request()));
+    ? flatResponseUrl(res).includes(pattern)
+    : pattern.test(flatResponseUrl(res));
 exports.responseMatcher = responseMatcher;
 /**
  * Accepts a pattern and a callback function, and returns a function that

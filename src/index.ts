@@ -1,5 +1,4 @@
-import type { Request, Response, BrowserContext, Page } from '@playwright/test'
-import type { Request as Request2 } from 'playwright'
+import type { Request, Response, BrowserContext, Page } from 'playwright'
 import axios from 'axios'
 
 /*************************************************************
@@ -9,10 +8,10 @@ import axios from 'axios'
 /**
  * Returns a flattened request URL by combining the URL and postData parameters
  * of the given Request object.
- * @param {Request | Request2} req The Request object containing the URL and postData.
+ * @param {Request} req The Request object containing the URL and postData.
  * @return {*}  {string} A string representing the flattened request URL.
  */
-export const flatRequestUrl = (req: Request | Request2): string => {
+export const flatRequestUrl = (req: Request): string => {
   const url = req.url()
   const body = req.postData() || ''
   if (!body) return url
@@ -22,13 +21,21 @@ export const flatRequestUrl = (req: Request | Request2): string => {
     .replace(/&&/g, '&')
     .replace(/&$/g, '')
 }
+/**
+ * Returns a flattened request URL from Response object, by combining the URL and postData
+ * parameters of the given Response's Request object.
+ *
+ * @param {Response} res A Response object
+ * @return {*}  {string} A string representing the flattened request URL.
+ */
+const flatResponseUrl = (res: Response): string => flatRequestUrl(res.request())
 
 /**
  * Accepts a pattern, and returns a function that returns true if a
  * request is matched by the pattern.
  * @param pattern - pattern to match the request URL.
  */
-export const requestMatcher = (pattern: RegExp | string) => (req: Request | Request2) =>
+export const requestMatcher = (pattern: RegExp | string) => (req: Request) =>
   typeof pattern === 'string' ? flatRequestUrl(req).includes(pattern) : pattern.test(flatRequestUrl(req))
 
 /**
@@ -38,8 +45,8 @@ export const requestMatcher = (pattern: RegExp | string) => (req: Request | Requ
  */
 export const responseMatcher = (pattern: RegExp | string) => (res: Response) =>
   typeof pattern === 'string'
-    ? flatRequestUrl(res.request()).includes(pattern)
-    : pattern.test(flatRequestUrl(res.request()))
+    ? flatResponseUrl(res).includes(pattern)
+    : pattern.test(flatResponseUrl(res))
 
 /**
  * Accepts a pattern and a callback function, and returns a function that
@@ -48,7 +55,7 @@ export const responseMatcher = (pattern: RegExp | string) => (res: Response) =>
  * @param pattern - pattern to match the request URL.
  * @param cb - Callback function that will be executed after if the request is matched.
  */
-export const requestMatcherCb = (pattern: RegExp | string, cb: (req: Request | Request2) => void) => (req: Request | Request2) => {
+export const requestMatcherCb = (pattern: RegExp | string, cb: (req: Request) => void) => (req: Request) => {
   if (requestMatcher(pattern)(req)) {
     try {
       cb(req)

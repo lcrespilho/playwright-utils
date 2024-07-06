@@ -5,6 +5,10 @@
 <dd><p>Returns a flattened request URL by combining the URL and postData parameters
 of the given Request object.</p>
 </dd>
+<dt><a href="#flatResponseUrl">flatResponseUrl(res)</a> ⇒ <code>*</code></dt>
+<dd><p>Returns a flattened request URL from Response object, by combining the URL and postData
+parameters of the given Response&#39;s Request object.</p>
+</dd>
 <dt><a href="#requestMatcher">requestMatcher(pattern)</a></dt>
 <dd><p>Accepts a pattern, and returns a function that returns true if a
 request is matched by the pattern.</p>
@@ -52,7 +56,20 @@ of the given Request object.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Request</code> \| <code>Request2</code> | The Request object containing the URL and postData. |
+| req | <code>Request</code> | The Request object containing the URL and postData. |
+
+<a name="flatResponseUrl"></a>
+
+## flatResponseUrl(res) ⇒ <code>\*</code>
+Returns a flattened request URL from Response object, by combining the URL and postData
+parameters of the given Response's Request object.
+
+**Kind**: global function  
+**Returns**: <code>\*</code> - {string} A string representing the flattened request URL.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| res | <code>Response</code> | A Response object |
 
 <a name="requestMatcher"></a>
 
