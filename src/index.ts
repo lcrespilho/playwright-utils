@@ -28,7 +28,7 @@ export const flatRequestUrl = (req: Request): string => {
  * @param {Response} res A Response object
  * @return {*}  {string} A string representing the flattened request URL.
  */
-const flatResponseUrl = (res: Response): string => flatRequestUrl(res.request())
+export const flatResponseUrl = (res: Response): string => flatRequestUrl(res.request())
 
 /**
  * Accepts a pattern, and returns a function that returns true if a

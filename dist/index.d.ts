@@ -10,6 +10,14 @@ import type { Request, Response, BrowserContext, Page } from 'playwright';
  */
 export declare const flatRequestUrl: (req: Request) => string;
 /**
+ * Returns a flattened request URL from Response object, by combining the URL and postData
+ * parameters of the given Response's Request object.
+ *
+ * @param {Response} res A Response object
+ * @return {*}  {string} A string representing the flattened request URL.
+ */
+export declare const flatResponseUrl: (res: Response) => string;
+/**
  * Accepts a pattern, and returns a function that returns true if a
  * request is matched by the pattern.
  * @param pattern - pattern to match the request URL.

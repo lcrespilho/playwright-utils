@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatRequestUrl = void 0;
+exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatResponseUrl = exports.flatRequestUrl = void 0;
 exports.saveJsonToGlitch = saveJsonToGlitch;
 exports.fetchJsonFromGlitch = fetchJsonFromGlitch;
 exports.saveSessionCookies = saveSessionCookies;
@@ -38,6 +38,7 @@ exports.flatRequestUrl = flatRequestUrl;
  * @return {*}  {string} A string representing the flattened request URL.
  */
 const flatResponseUrl = (res) => (0, exports.flatRequestUrl)(res.request());
+exports.flatResponseUrl = flatResponseUrl;
 /**
  * Accepts a pattern, and returns a function that returns true if a
  * request is matched by the pattern.
@@ -51,8 +52,8 @@ exports.requestMatcher = requestMatcher;
  * @param pattern - pattern to match the response URL.
  */
 const responseMatcher = (pattern) => (res) => typeof pattern === 'string'
-    ? flatResponseUrl(res).includes(pattern)
-    : pattern.test(flatResponseUrl(res));
+    ? (0, exports.flatResponseUrl)(res).includes(pattern)
+    : pattern.test((0, exports.flatResponseUrl)(res));
 exports.responseMatcher = responseMatcher;
 /**
  * Accepts a pattern and a callback function, and returns a function that
