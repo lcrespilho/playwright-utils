@@ -44,9 +44,7 @@ export const requestMatcher = (pattern: RegExp | string) => (req: Request) =>
  * @param pattern - pattern to match the response URL.
  */
 export const responseMatcher = (pattern: RegExp | string) => (res: Response) =>
-  typeof pattern === 'string'
-    ? flatResponseUrl(res).includes(pattern)
-    : pattern.test(flatResponseUrl(res))
+  typeof pattern === 'string' ? flatResponseUrl(res).includes(pattern) : pattern.test(flatResponseUrl(res))
 
 /**
  * Accepts a pattern and a callback function, and returns a function that
@@ -168,15 +166,17 @@ export async function restoreSessionCookies(context: BrowserContext, key: string
  * @export
  * @param {BrowserContext} context - Contexto do browser.
  * @param {string} tagAssistantUrl - url completa de preview do Tag Assistant.
+ *
+ * Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987
  * @example
  * ```typescript
  * test.beforeEach(async ({ context }) => {
- *   await previewGTM(context, 'https://tagassistant.google.com/#/?source=TAG_MANAGER&id=GTM-123&gtm_auth=456&gtm_preview=env-913&cb=1051629219902535');
+ *   await previewGTM(context, 'https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987');
  * });
  * ```
  */
 export async function previewGTM(context: BrowserContext, tagAssistantUrl: string) {
-  let url = new URL(tagAssistantUrl.replace('#/', ''))
+  let url = new URL(tagAssistantUrl.replace(/\/\?.*?#\/\?/, '/?'))
   const containerId = url.searchParams.get('id')
   const gtm_auth = url.searchParams.get('gtm_auth')
   const gtm_preview = url.searchParams.get('gtm_preview')
