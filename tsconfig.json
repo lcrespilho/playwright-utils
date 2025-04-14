@@ -7,7 +7,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "noImplicitAny": true,
-    "declaration": true
+    "declaration": true // obrigatório para bibliotecas
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
