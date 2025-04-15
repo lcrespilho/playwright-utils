@@ -1,4 +1,4 @@
-import type { Request, Response, BrowserContext, Page } from 'playwright'
+import type { Request, Response, BrowserContext, Page } from '@playwright/test'
 import axios from 'axios'
 
 /*************************************************************
@@ -165,9 +165,7 @@ export async function restoreSessionCookies(context: BrowserContext, key: string
  *
  * @export
  * @param {BrowserContext} context - Contexto do browser.
- * @param {string} tagAssistantUrl - url completa de preview do Tag Assistant.
- *
- * Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987
+ * @param {string} tagAssistantUrl - url completa de preview do Tag Assistant. Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987
  * @example
  * ```typescript
  * test.beforeEach(async ({ context }) => {
@@ -242,4 +240,181 @@ export async function scrollToBottom({
   }
   if (returnToTop) await page.evaluate(() => scrollTo({ top: 0, behavior: 'smooth' }))
   if (timeToWaitAfterScroll > 0) await page.waitForTimeout(timeToWaitAfterScroll)
+}
+
+/**
+ * Waits for a specific Web To Server request to be made and returns its details.
+ *
+ * @export
+ * @throws {Error} Throws an error if events_received is not equal to 1
+ *
+ * @example
+ * ```typescript
+ * const { event_data, event_id, requestUrl } = await waitForWebToServer({
+ *   page,
+ *   eventName: 'page_view',
+ *   timeout: 15000
+ * })
+ * console.log(event_id, requestUrl)
+ * ```
+ */
+export async function waitForWebToServer({
+  page,
+  eventName = '',
+  eventId = '',
+  timeout,
+}: {
+  page: Page
+  /**
+   * Optional The name of the Web To Server event to wait for
+   */
+  eventName?: string
+  /**
+   * Optional Unique identifier for the event to match
+   */
+  eventId?: string
+  /**
+   * Optional Timeout in milliseconds (defaults to Playwright's default timeout)
+   */
+  timeout?: number
+}): Promise<{
+  /**
+   * Name of the event
+   */
+  event_name: string
+  /**
+   * Unique identifier for the event
+   */
+  event_id: string
+  /**
+   * Sent event payload containing event-specific information
+   */
+  event_data: Record<string, any>
+  responseBody: {
+    request: {
+      data: Record<string, any>[]
+    }
+    /**
+     * Facebook CAPI response - this is not from WTS implementation. It's specific
+     * to Electrolux sGTM WTS implementation. It's not "universal" and don't exist
+     * in another clients.
+     */
+    response: {
+      /**
+       * Should be 1 for successful requests
+       */
+      events_received: number
+      /**
+       * Error messages
+       */
+      messages: string[]
+      /**
+       * Facebook trace ID for debugging
+       */
+      fbtrace_id: string
+    }
+  }
+  /**
+   * Complete url of the Web To Server request
+   */
+  requestUrl: string
+}> {
+  let re: RegExp = new RegExp(`/web-to-server\\?en=${eventName || '.*?'}&eid=${eventId}`)
+  let request: Request
+  if (timeout) {
+    request = await page.waitForRequest(request => re.test(request.url()), { timeout })
+  } else {
+    request = await page.waitForRequest(request => re.test(request.url()))
+  }
+  const responseBody: {
+    request: {
+      data: Record<string, any>[]
+    }
+    response: {
+      events_received: number
+      messages: string[]
+      fbtrace_id: string
+    }
+  } = await (await request.response())?.json()
+  let {
+    en: event_name,
+    eid: event_id,
+    ed: event_data_string,
+  } = Object.fromEntries(new URL(request.url()).searchParams.entries())
+  const event_data: Record<string, any> = JSON.parse(Buffer.from(event_data_string, 'base64').toString('utf8'))
+  if (responseBody.response.events_received !== 1) throw new Error(JSON.stringify(responseBody.response))
+  return { event_name, event_id, event_data, responseBody, requestUrl: request.url() }
+}
+
+/**
+ * Waits for a specific Facebook Pixel request to be make and returns its details.
+ *
+ * @export
+ *
+ * @example
+ * ```typescript
+ * const { event_id, requestUrl } = await waitForFacebookPixel({
+ *   page,
+ *   eventName: 'PageView',
+ *   pixelId: '123123123123',
+ *   timeout: 15000
+ * })
+ * console.log(event_id, requestUrl)
+ * ```
+ */
+export async function waitForFacebookPixel({
+  page,
+  eventName = '',
+  pixelId = '',
+  eventId = '',
+  timeout,
+}: {
+  page: Page
+  /**
+   * Optional The name of the pixel event to wait for
+   */
+  eventName?: string
+  /**
+   * Optional Facebook Pixel ID to match
+   */
+  pixelId?: string
+  /**
+   * Optional Unique identifier for the event to match
+   */
+  eventId?: string
+  /**
+   * Optional Timeout in milliseconds (defaults to Playwright's default timeout)
+   */
+  timeout?: number
+}): Promise<{
+  /**
+   * Name of the event
+   */
+  event_name: string
+  /**
+   * Unique identifier for the event
+   */
+  event_id: string
+  /**
+   * Facebook Pixel ID.
+   */
+  pixel_id: string
+  /**
+   * Complete url of the request
+   */
+  requestUrl: string
+}> {
+  let re: RegExp = new RegExp(`facebook.com/tr/\\?id=${pixelId || '.*?'}&ev=${eventName}&.*&eid=${eventId}`)
+  let request: Request
+  if (timeout) {
+    request = await page.waitForRequest(request => re.test(request.url()), { timeout })
+  } else {
+    request = await page.waitForRequest(request => re.test(request.url()))
+  }
+  let {
+    eid: event_id,
+    ev: event_name,
+    id: pixel_id,
+  } = Object.fromEntries(new URL(request.url()).searchParams.entries())
+  return { event_name, event_id, pixel_id, requestUrl: request.url() }
 }

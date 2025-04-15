@@ -43,6 +43,12 @@ habilitando debug de GA3 (analytics.js) e GA4 (gtag).</p>
 <dt><a href="#scrollToBottom">scrollToBottom()</a></dt>
 <dd><p>Realiza scroll até o fundo da página, suavemente.</p>
 </dd>
+<dt><a href="#waitForWebToServer">waitForWebToServer()</a></dt>
+<dd><p>Waits for a specific Web To Server request to be made and returns its details.</p>
+</dd>
+<dt><a href="#waitForFacebookPixel">waitForFacebookPixel()</a></dt>
+<dd><p>Waits for a specific Facebook Pixel request to be make and returns its details.</p>
+</dd>
 </dl>
 
 <a name="flatRequestUrl"></a>
@@ -182,12 +188,12 @@ Realiza preview do GTM. Deve ser utilizada via `test.beforeEach` ou no próprio 
 | Param | Type | Description |
 | --- | --- | --- |
 | context | <code>BrowserContext</code> | Contexto do browser. |
-| tagAssistantUrl | <code>string</code> | url completa de preview do Tag Assistant. |
+| tagAssistantUrl | <code>string</code> | url completa de preview do Tag Assistant. Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987 |
 
 **Example**  
 ```typescript
 test.beforeEach(async ({ context }) => {
-  await previewGTM(context, 'https://tagassistant.google.com/#/?source=TAG_MANAGER&id=GTM-123&gtm_auth=456&gtm_preview=env-913&cb=1051629219902535');
+  await previewGTM(context, 'https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987');
 });
 ```
 <a name="enableGADebug"></a>
@@ -203,6 +209,41 @@ habilitando debug de GA3 (analytics.js) e GA4 (gtag).
 Realiza scroll até o fundo da página, suavemente.
 
 **Kind**: global function  
+<a name="waitForWebToServer"></a>
+
+## waitForWebToServer()
+Waits for a specific Web To Server request to be made and returns its details.
+
+**Kind**: global function  
+**Throws**:
+
+- <code>Error</code> Throws an error if events_received is not equal to 1
+
+**Example**  
+```typescript
+const { event_data, event_id, requestUrl } = await waitForWebToServer({
+  page,
+  eventName: 'page_view',
+  timeout: 15000
+})
+console.log(event_id, requestUrl)
+```
+<a name="waitForFacebookPixel"></a>
+
+## waitForFacebookPixel()
+Waits for a specific Facebook Pixel request to be make and returns its details.
+
+**Kind**: global function  
+**Example**  
+```typescript
+const { event_id, requestUrl } = await waitForFacebookPixel({
+  page,
+  eventName: 'PageView',
+  pixelId: '123123123123',
+  timeout: 15000
+})
+console.log(event_id, requestUrl)
+```
 
 ---
 

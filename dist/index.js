@@ -8,6 +8,8 @@ exports.restoreSessionCookies = restoreSessionCookies;
 exports.previewGTM = previewGTM;
 exports.enableGADebug = enableGADebug;
 exports.scrollToBottom = scrollToBottom;
+exports.waitForWebToServer = waitForWebToServer;
+exports.waitForFacebookPixel = waitForFacebookPixel;
 const axios_1 = require("axios");
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
@@ -51,9 +53,7 @@ exports.requestMatcher = requestMatcher;
  * response is matched by the pattern.
  * @param pattern - pattern to match the response URL.
  */
-const responseMatcher = (pattern) => (res) => typeof pattern === 'string'
-    ? (0, exports.flatResponseUrl)(res).includes(pattern)
-    : pattern.test((0, exports.flatResponseUrl)(res));
+const responseMatcher = (pattern) => (res) => typeof pattern === 'string' ? (0, exports.flatResponseUrl)(res).includes(pattern) : pattern.test((0, exports.flatResponseUrl)(res));
 exports.responseMatcher = responseMatcher;
 /**
  * Accepts a pattern and a callback function, and returns a function that
@@ -171,16 +171,16 @@ async function restoreSessionCookies(context, key) {
  *
  * @export
  * @param {BrowserContext} context - Contexto do browser.
- * @param {string} tagAssistantUrl - url completa de preview do Tag Assistant.
+ * @param {string} tagAssistantUrl - url completa de preview do Tag Assistant. Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987
  * @example
  * ```typescript
  * test.beforeEach(async ({ context }) => {
- *   await previewGTM(context, 'https://tagassistant.google.com/#/?source=TAG_MANAGER&id=GTM-123&gtm_auth=456&gtm_preview=env-913&cb=1051629219902535');
+ *   await previewGTM(context, 'https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987');
  * });
  * ```
  */
 async function previewGTM(context, tagAssistantUrl) {
-    let url = new URL(tagAssistantUrl.replace('#/', ''));
+    let url = new URL(tagAssistantUrl.replace(/\/\?.*?#\/\?/, '/?'));
     const containerId = url.searchParams.get('id');
     const gtm_auth = url.searchParams.get('gtm_auth');
     const gtm_preview = url.searchParams.get('gtm_preview');
@@ -222,5 +222,65 @@ async function scrollToBottom({ page, timeToWaitAfterScroll = 0, returnToTop = t
         await page.evaluate(() => scrollTo({ top: 0, behavior: 'smooth' }));
     if (timeToWaitAfterScroll > 0)
         await page.waitForTimeout(timeToWaitAfterScroll);
+}
+/**
+ * Waits for a specific Web To Server request to be made and returns its details.
+ *
+ * @export
+ * @throws {Error} Throws an error if events_received is not equal to 1
+ *
+ * @example
+ * ```typescript
+ * const { event_data, event_id, requestUrl } = await waitForWebToServer({
+ *   page,
+ *   eventName: 'page_view',
+ *   timeout: 15000
+ * })
+ * console.log(event_id, requestUrl)
+ * ```
+ */
+async function waitForWebToServer({ page, eventName = '', eventId = '', timeout, }) {
+    let re = new RegExp(`/web-to-server\\?en=${eventName || '.*?'}&eid=${eventId}`);
+    let request;
+    if (timeout) {
+        request = await page.waitForRequest(request => re.test(request.url()), { timeout });
+    }
+    else {
+        request = await page.waitForRequest(request => re.test(request.url()));
+    }
+    const responseBody = await (await request.response())?.json();
+    let { en: event_name, eid: event_id, ed: event_data_string, } = Object.fromEntries(new URL(request.url()).searchParams.entries());
+    const event_data = JSON.parse(Buffer.from(event_data_string, 'base64').toString('utf8'));
+    if (responseBody.response.events_received !== 1)
+        throw new Error(JSON.stringify(responseBody.response));
+    return { event_name, event_id, event_data, responseBody, requestUrl: request.url() };
+}
+/**
+ * Waits for a specific Facebook Pixel request to be make and returns its details.
+ *
+ * @export
+ *
+ * @example
+ * ```typescript
+ * const { event_id, requestUrl } = await waitForFacebookPixel({
+ *   page,
+ *   eventName: 'PageView',
+ *   pixelId: '123123123123',
+ *   timeout: 15000
+ * })
+ * console.log(event_id, requestUrl)
+ * ```
+ */
+async function waitForFacebookPixel({ page, eventName = '', pixelId = '', eventId = '', timeout, }) {
+    let re = new RegExp(`facebook.com/tr/\\?id=${pixelId || '.*?'}&ev=${eventName}&.*&eid=${eventId}`);
+    let request;
+    if (timeout) {
+        request = await page.waitForRequest(request => re.test(request.url()), { timeout });
+    }
+    else {
+        request = await page.waitForRequest(request => re.test(request.url()));
+    }
+    let { eid: event_id, ev: event_name, id: pixel_id, } = Object.fromEntries(new URL(request.url()).searchParams.entries());
+    return { event_name, event_id, pixel_id, requestUrl: request.url() };
 }
 //# sourceMappingURL=index.js.map
