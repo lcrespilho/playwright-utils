@@ -1,6 +1,6 @@
 {
   "name": "@lcrespilho/playwright-utils",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Coleção de funções utilitárias que utilizo frequentemente com o Playwright",
   "repository": {
     "type": "git",
