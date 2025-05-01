@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatResponseUrl = exports.flatRequestUrl = void 0;
 exports.saveJsonToGlitch = saveJsonToGlitch;
@@ -10,7 +13,7 @@ exports.enableGADebug = enableGADebug;
 exports.scrollToBottom = scrollToBottom;
 exports.waitForWebToServer = waitForWebToServer;
 exports.waitForFacebookPixel = waitForFacebookPixel;
-const axios_1 = require("axios");
+const axios_1 = __importDefault(require("axios"));
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
  *************************************************************/
