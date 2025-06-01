@@ -234,8 +234,8 @@ export async function scrollToBottom({
    */
   returnToTop?: boolean
 }) {
-  while (await page.evaluate('scrollY + outerHeight + 10 < document.body.scrollHeight')) {
-    await page.evaluate(() => scrollBy({ behavior: 'smooth', top: 1.5 * outerHeight }))
+  while (await page.evaluate('scrollY + innerHeight + 20 < document.body.scrollHeight')) {
+    await page.evaluate(() => scrollBy({ behavior: 'smooth', top: 1.5 * innerHeight }))
     await page.waitForTimeout(700)
   }
   if (returnToTop) await page.evaluate(() => scrollTo({ top: 0, behavior: 'smooth' }))
