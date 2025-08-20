@@ -1,4 +1,4 @@
-import type { Request, Response, BrowserContext, Page } from '@playwright/test';
+import type { Request, Response, BrowserContext, Page, Locator } from '@playwright/test';
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
  *************************************************************/
@@ -257,3 +257,14 @@ export declare function waitForFacebookPixel({ page, eventName, pixelId, eventId
      */
     requestUrl: string;
 }>;
+/**
+ * Highlights a locator on the page.
+ * @param locator The locator to highlight.
+ * @export
+ * @example
+ * ```typescript
+ * const locator = page.getByRole('button', { name: 'Click Me' })
+ * await highlightLocator(locator)
+ * ```
+ */
+export declare function highlightLocator(locator: Locator): Promise<void>;

@@ -13,6 +13,7 @@ exports.enableGADebug = enableGADebug;
 exports.scrollToBottom = scrollToBottom;
 exports.waitForWebToServer = waitForWebToServer;
 exports.waitForFacebookPixel = waitForFacebookPixel;
+exports.highlightLocator = highlightLocator;
 const axios_1 = __importDefault(require("axios"));
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
@@ -285,5 +286,22 @@ async function waitForFacebookPixel({ page, eventName = '', pixelId = '', eventI
     }
     let { eid: event_id, ev: event_name, id: pixel_id, } = Object.fromEntries(new URL(request.url()).searchParams.entries());
     return { event_name, event_id, pixel_id, requestUrl: request.url() };
+}
+/**
+ * Highlights a locator on the page.
+ * @param locator The locator to highlight.
+ * @export
+ * @example
+ * ```typescript
+ * const locator = page.getByRole('button', { name: 'Click Me' })
+ * await highlightLocator(locator)
+ * ```
+ */
+async function highlightLocator(locator) {
+    await locator.evaluate(element => {
+        element.style.border = '4px solid red';
+        element.style.boxShadow = '0 0 20px 10px rgba(255, 0, 0, 0.5)';
+        element.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
+    });
 }
 //# sourceMappingURL=index.js.map

@@ -1,4 +1,4 @@
-import type { Request, Response, BrowserContext, Page } from '@playwright/test'
+import type { Request, Response, BrowserContext, Page, Locator } from '@playwright/test'
 import axios from 'axios'
 
 /*************************************************************
@@ -417,4 +417,22 @@ export async function waitForFacebookPixel({
     id: pixel_id,
   } = Object.fromEntries(new URL(request.url()).searchParams.entries())
   return { event_name, event_id, pixel_id, requestUrl: request.url() }
+}
+
+/**
+ * Highlights a locator on the page.
+ * @param locator The locator to highlight.
+ * @export
+ * @example
+ * ```typescript
+ * const locator = page.getByRole('button', { name: 'Click Me' })
+ * await highlightLocator(locator)
+ * ```
+ */
+export async function highlightLocator(locator: Locator) {
+  await locator.evaluate(element => {
+    element.style.border = '4px solid red'
+    element.style.boxShadow = '0 0 20px 10px rgba(255, 0, 0, 0.5)'
+    element.style.backgroundColor = 'rgba(255, 255, 0, 0.3)'
+  })
 }
