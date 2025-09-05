@@ -1,6 +1,6 @@
 {
   "name": "@lcrespilho/playwright-utils",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Coleção de funções utilitárias que utilizo frequentemente com o Playwright",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "publica": "tsc && npm publish --access public",
+    "publica": "tsc && npm publish --access public --tag latest",
     "jsdoc2markdown": "jsdoc2md --files dist/index.js > README.md && cat README.leo >> README.md"
   },
   "keywords": [],

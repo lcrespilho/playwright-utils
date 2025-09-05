@@ -98,10 +98,10 @@ export declare function restoreSessionCookies(context: BrowserContext, key: stri
  ********* Guarda/restaura cookies no Glitch - end ***********
  *************************************************************/
 /**
- * Realiza preview do GTM. Deve ser utilizada via `test.beforeEach` ou no próprio `test`.
+ * Realiza preview do GTM. Pode ser utilizada em `test.beforeEach` ou `test`.
  *
  * @export
- * @param {BrowserContext} context - Contexto do browser.
+ * @param {Page | BrowserContext} pageOrContext - Contexto ou página do browser.
  * @param {string} tagAssistantUrl - url completa de preview do Tag Assistant. Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987
  * @example
  * ```typescript
@@ -110,7 +110,7 @@ export declare function restoreSessionCookies(context: BrowserContext, key: stri
  * });
  * ```
  */
-export declare function previewGTM(context: BrowserContext, tagAssistantUrl: string): Promise<void>;
+export declare function previewGTM(pageOrContext: Page | BrowserContext, tagAssistantUrl: string): Promise<void>;
 /**
  * Simula a extensão Google Analytics Debugger (https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna),
  * habilitando debug de GA3 (analytics.js) e GA4 (gtag).

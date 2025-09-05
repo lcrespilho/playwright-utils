@@ -33,8 +33,8 @@ callback with the response object as parameter.</p>
 <dt><a href="#restoreSessionCookies">restoreSessionCookies(context, key)</a></dt>
 <dd><p>Restaura, no contexto do browser, os cookies previamente salvos no Glitch.</p>
 </dd>
-<dt><a href="#previewGTM">previewGTM(context, tagAssistantUrl)</a></dt>
-<dd><p>Realiza preview do GTM. Deve ser utilizada via <code>test.beforeEach</code> ou no próprio <code>test</code>.</p>
+<dt><a href="#previewGTM">previewGTM(pageOrContext, tagAssistantUrl)</a></dt>
+<dd><p>Realiza preview do GTM. Pode ser utilizada em <code>test.beforeEach</code> ou <code>test</code>.</p>
 </dd>
 <dt><a href="#enableGADebug">enableGADebug()</a></dt>
 <dd><p>Simula a extensão Google Analytics Debugger (<a href="https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna">https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna</a>),
@@ -48,6 +48,9 @@ habilitando debug de GA3 (analytics.js) e GA4 (gtag).</p>
 </dd>
 <dt><a href="#waitForFacebookPixel">waitForFacebookPixel()</a></dt>
 <dd><p>Waits for a specific Facebook Pixel request to be make and returns its details.</p>
+</dd>
+<dt><a href="#highlightLocator">highlightLocator(locator)</a></dt>
+<dd><p>Highlights a locator on the page.</p>
 </dd>
 </dl>
 
@@ -180,14 +183,14 @@ test.afterEach(async ({ context }) => {
 ```
 <a name="previewGTM"></a>
 
-## previewGTM(context, tagAssistantUrl)
-Realiza preview do GTM. Deve ser utilizada via `test.beforeEach` ou no próprio `test`.
+## previewGTM(pageOrContext, tagAssistantUrl)
+Realiza preview do GTM. Pode ser utilizada em `test.beforeEach` ou `test`.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| context | <code>BrowserContext</code> | Contexto do browser. |
+| pageOrContext | <code>Page</code> \| <code>BrowserContext</code> | Contexto ou página do browser. |
 | tagAssistantUrl | <code>string</code> | url completa de preview do Tag Assistant. Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987 |
 
 **Example**  
@@ -243,6 +246,22 @@ const { event_id, requestUrl } = await waitForFacebookPixel({
   timeout: 15000
 })
 console.log(event_id, requestUrl)
+```
+<a name="highlightLocator"></a>
+
+## highlightLocator(locator)
+Highlights a locator on the page.
+
+**Kind**: global function  
+
+| Param | Description |
+| --- | --- |
+| locator | The locator to highlight. |
+
+**Example**  
+```typescript
+const locator = page.getByRole('button', { name: 'Click Me' })
+await highlightLocator(locator)
 ```
 
 ---

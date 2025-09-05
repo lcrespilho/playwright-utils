@@ -171,10 +171,10 @@ async function restoreSessionCookies(context, key) {
  ********* Guarda/restaura cookies no Glitch - end ***********
  *************************************************************/
 /**
- * Realiza preview do GTM. Deve ser utilizada via `test.beforeEach` ou no próprio `test`.
+ * Realiza preview do GTM. Pode ser utilizada em `test.beforeEach` ou `test`.
  *
  * @export
- * @param {BrowserContext} context - Contexto do browser.
+ * @param {Page | BrowserContext} pageOrContext - Contexto ou página do browser.
  * @param {string} tagAssistantUrl - url completa de preview do Tag Assistant. Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987
  * @example
  * ```typescript
@@ -183,14 +183,17 @@ async function restoreSessionCookies(context, key) {
  * });
  * ```
  */
-async function previewGTM(context, tagAssistantUrl) {
-    let url = new URL(tagAssistantUrl.replace(/\/\?.*?#\/\?/, '/?'));
-    const containerId = url.searchParams.get('id');
-    const gtm_auth = url.searchParams.get('gtm_auth');
-    const gtm_preview = url.searchParams.get('gtm_preview');
-    await context.route(new RegExp(`googletagmanager.com/gtm.js\\?id=${containerId}(?!.*gtm_auth=)(?!.*gtm_preview=)`), route => route.continue({
-        url: `https://www.googletagmanager.com/gtm.js?id=${containerId}&gtm_auth=${gtm_auth}&gtm_preview=${gtm_preview}&cb=${Date.now()}`,
-    }));
+async function previewGTM(pageOrContext, tagAssistantUrl) {
+    let taUrl = new URL(tagAssistantUrl.replace(/\/\?.*?#\/\?/, '/?'));
+    const containerId = taUrl.searchParams.get('id');
+    const gtm_auth = taUrl.searchParams.get('gtm_auth');
+    const gtm_preview = taUrl.searchParams.get('gtm_preview');
+    await pageOrContext.route(new RegExp(`gtm.js\\?id=${containerId}(?!.*gtm_auth=)(?!.*gtm_preview=)`), (route, request) => {
+        const requestHostname = new URL(request.url()).hostname;
+        route.continue({
+            url: `https://${requestHostname}/gtm.js?id=${containerId}&gtm_auth=${gtm_auth}&gtm_preview=${gtm_preview}&cb=${Date.now()}`,
+        });
+    });
 }
 /**
  * Simula a extensão Google Analytics Debugger (https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna),
