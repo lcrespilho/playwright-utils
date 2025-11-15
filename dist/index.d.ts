@@ -113,7 +113,7 @@ export declare function restoreSessionCookies(context: BrowserContext, key: stri
 export declare function previewGTM(pageOrContext: Page | BrowserContext, tagAssistantUrl: string): Promise<void>;
 /**
  * Simula a extensão Google Analytics Debugger (https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna),
- * habilitando debug de GA3 (analytics.js) e GA4 (gtag).
+ * habilitando debug GA4 (gtag).
  */
 export declare function enableGADebug(context: BrowserContext): Promise<void>;
 /**

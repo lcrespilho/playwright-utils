@@ -38,7 +38,7 @@ callback with the response object as parameter.</p>
 </dd>
 <dt><a href="#enableGADebug">enableGADebug()</a></dt>
 <dd><p>Simula a extensão Google Analytics Debugger (<a href="https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna">https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna</a>),
-habilitando debug de GA3 (analytics.js) e GA4 (gtag).</p>
+habilitando debug GA4 (gtag).</p>
 </dd>
 <dt><a href="#scrollToBottom">scrollToBottom()</a></dt>
 <dd><p>Realiza scroll até o fundo da página, suavemente.</p>
@@ -203,7 +203,7 @@ test.beforeEach(async ({ context }) => {
 
 ## enableGADebug()
 Simula a extensão Google Analytics Debugger (https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna),
-habilitando debug de GA3 (analytics.js) e GA4 (gtag).
+habilitando debug GA4 (gtag).
 
 **Kind**: global function  
 <a name="scrollToBottom"></a>

@@ -1,6 +1,6 @@
 {
   "name": "@lcrespilho/playwright-utils",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "Coleção de funções utilitárias que utilizo frequentemente com o Playwright",
   "repository": {
     "type": "git",
@@ -13,8 +13,15 @@
   ],
   "scripts": {
     "build": "tsc",
-    "publica": "tsc && npm publish --access public --tag latest",
-    "jsdoc2markdown": "jsdoc2md --files dist/index.js > README.md && cat README.leo >> README.md"
+    "publish-prod-patch": "npm version patch --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag latest",
+    "publish-prod-minor": "npm version minor --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag latest",
+    "publish-prod-major": "npm version major --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag latest",
+    "publish-dev-patch": "npm version prepatch --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
+    "publish-dev-minor": "npm version preminor --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
+    "publish-dev-major": "npm version premajor --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
+    "publish-dev-prerelease": "npm version prerelease --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
+    "jsdoc2markdown": "jsdoc2md --files dist/index.js > README.md && cat README.leo >> README.md",
+    "pack": "tsc && npm pack"
   },
   "keywords": [],
   "author": "",

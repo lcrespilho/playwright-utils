@@ -190,19 +190,17 @@ export async function previewGTM(pageOrContext: Page | BrowserContext, tagAssist
 
 /**
  * Simula a extensão Google Analytics Debugger (https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna),
- * habilitando debug de GA3 (analytics.js) e GA4 (gtag).
+ * habilitando debug GA4 (gtag).
  */
 export async function enableGADebug(context: BrowserContext) {
-  // Debug de GA3
-  await context.route('https://www.google-analytics.com/analytics.js', route =>
-    route.continue({
-      url: 'https://www.google-analytics.com/analytics_debug.js',
-    })
-  )
-  // Adiciona mais informações de debug
-  await context.addInitScript('window.ga_debug = { trace: true }')
+  await context.route(/\/gtag\/(js|destination)(?!.*dbg=1)/, async (route, request) => {
+    const url = new URL(request.url())
+    url.searchParams.set('dbg', '1')
+    url.hostname = 'www.googletagmanager.com'
+    route.continue({ url: url.href })
+  })
 
-  // Debug de GA4/gtag
+  // Debug de gtag
   await context.addCookies([
     {
       name: 'gtm_debug',
