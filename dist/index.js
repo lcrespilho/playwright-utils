@@ -220,8 +220,10 @@ async function enableGADebug(context) {
 /**
  * Realiza scroll até o fundo da página, suavemente.
  */
-async function scrollToBottom({ page, timeToWaitAfterScroll = 0, returnToTop = true, }) {
-    while (await page.evaluate('scrollY + innerHeight + 20 < document.body.scrollHeight')) {
+async function scrollToBottom({ page, timeToWaitAfterScroll = 0, returnToTop = true, timeout = Infinity, }) {
+    const t0 = Date.now();
+    while (Date.now() - t0 < timeout &&
+        (await page.evaluate('scrollY + innerHeight + 20 < document.body.scrollHeight'))) {
         await page.evaluate(() => scrollBy({ behavior: 'smooth', top: 1.5 * innerHeight }));
         await page.waitForTimeout(700);
     }

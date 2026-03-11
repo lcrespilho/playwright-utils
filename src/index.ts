@@ -184,7 +184,7 @@ export async function previewGTM(pageOrContext: Page | BrowserContext, tagAssist
       route.continue({
         url: `https://${requestHostname}/gtm.js?id=${containerId}&gtm_auth=${gtm_auth}&gtm_preview=${gtm_preview}&cb=${Date.now()}`,
       })
-    }
+    },
   )
 }
 
@@ -219,6 +219,7 @@ export async function scrollToBottom({
   page,
   timeToWaitAfterScroll = 0,
   returnToTop = true,
+  timeout = Infinity,
 }: {
   /**
    * The page to be scrolled.
@@ -232,8 +233,16 @@ export async function scrollToBottom({
    * If should return to top after scroll to the bottom. [Default = true (return to top)]
    */
   returnToTop?: boolean
+  /**
+   * Optional timeout in ms to wait for the scroll to bottom action to complete. [Default = Infinity]
+   */
+  timeout?: number
 }) {
-  while (await page.evaluate('scrollY + innerHeight + 20 < document.body.scrollHeight')) {
+  const t0 = Date.now()
+  while (
+    Date.now() - t0 < timeout &&
+    (await page.evaluate('scrollY + innerHeight + 20 < document.body.scrollHeight'))
+  ) {
     await page.evaluate(() => scrollBy({ behavior: 'smooth', top: 1.5 * innerHeight }))
     await page.waitForTimeout(700)
   }

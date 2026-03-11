@@ -119,7 +119,7 @@ export declare function enableGADebug(context: BrowserContext): Promise<void>;
 /**
  * Realiza scroll até o fundo da página, suavemente.
  */
-export declare function scrollToBottom({ page, timeToWaitAfterScroll, returnToTop, }: {
+export declare function scrollToBottom({ page, timeToWaitAfterScroll, returnToTop, timeout, }: {
     /**
      * The page to be scrolled.
      */
@@ -132,6 +132,10 @@ export declare function scrollToBottom({ page, timeToWaitAfterScroll, returnToTo
      * If should return to top after scroll to the bottom. [Default = true (return to top)]
      */
     returnToTop?: boolean;
+    /**
+     * Optional timeout in ms to wait for the scroll to bottom action to complete. [Default = Infinity]
+     */
+    timeout?: number;
 }): Promise<void>;
 /**
  * Waits for a specific Web To Server request to be made and returns its details.
