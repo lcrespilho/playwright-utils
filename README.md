@@ -2,8 +2,7 @@
 
 <dl>
 <dt><a href="#flatRequestUrl">flatRequestUrl(req)</a> ⇒ <code>*</code></dt>
-<dd><p>Returns a flattened request URL by combining the URL and postData parameters
-of the given Request object.</p>
+<dd><p>Returns a flattened request URL by combining the URL and postData parameters of the given Request-like object.</p>
 </dd>
 <dt><a href="#flatResponseUrl">flatResponseUrl(res)</a> ⇒ <code>*</code></dt>
 <dd><p>Returns a flattened request URL from Response object, by combining the URL and postData
@@ -57,15 +56,14 @@ habilitando debug GA4 (gtag).</p>
 <a name="flatRequestUrl"></a>
 
 ## flatRequestUrl(req) ⇒ <code>\*</code>
-Returns a flattened request URL by combining the URL and postData parameters
-of the given Request object.
+Returns a flattened request URL by combining the URL and postData parameters of the given Request-like object.
 
 **Kind**: global function  
-**Returns**: <code>\*</code> - {string} A string representing the flattened request URL.  
+**Returns**: <code>\*</code> - {string} A string representing the flattened request URL  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Request</code> | The Request object containing the URL and postData. |
+| req | <code>RequestLike</code> | The Request-like object containing the URL and postData |
 
 <a name="flatResponseUrl"></a>
 
@@ -268,3 +266,13 @@ await highlightLocator(locator)
 
 ### Como criar pacotes NPM
 https://www.youtube.com/watch?v=Nh9xW2-ZOEU
+
+## Desenvolvendo
+- alterar src/index.ts
+- logue no npm: `npm login`
+- gerar um pacote com `npm run pack`
+- instalar esse pacote gerado no projeto que deseja testar a nova versão da lib: `cd /caminho/projeto/; npm install /caminho/pacote.tgz`
+
+## Publicando
+- `npm run jsdoc2markdown`
+- `npm run publish-prod-{patch|minor|major}` <- isso já faz tudo: bump version, build, publish
