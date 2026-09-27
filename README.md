@@ -1,13 +1,6 @@
 ## Functions
 
 <dl>
-<dt><a href="#flatRequestUrl">flatRequestUrl(req)</a> ⇒ <code>*</code></dt>
-<dd><p>Returns a flattened request URL by combining the URL and postData parameters of the given Request-like object.</p>
-</dd>
-<dt><a href="#flatResponseUrl">flatResponseUrl(res)</a> ⇒ <code>*</code></dt>
-<dd><p>Returns a flattened request URL from Response object, by combining the URL and postData
-parameters of the given Response&#39;s Request object.</p>
-</dd>
 <dt><a href="#requestMatcher">requestMatcher(pattern)</a></dt>
 <dd><p>Accepts a pattern, and returns a function that returns true if a
 request is matched by the pattern.</p>
@@ -52,31 +45,6 @@ habilitando debug GA4 (gtag).</p>
 <dd><p>Highlights a locator on the page.</p>
 </dd>
 </dl>
-
-<a name="flatRequestUrl"></a>
-
-## flatRequestUrl(req) ⇒ <code>\*</code>
-Returns a flattened request URL by combining the URL and postData parameters of the given Request-like object.
-
-**Kind**: global function  
-**Returns**: <code>\*</code> - {string} A string representing the flattened request URL  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| req | <code>RequestLike</code> | The Request-like object containing the URL and postData |
-
-<a name="flatResponseUrl"></a>
-
-## flatResponseUrl(res) ⇒ <code>\*</code>
-Returns a flattened request URL from Response object, by combining the URL and postData
-parameters of the given Response's Request object.
-
-**Kind**: global function  
-**Returns**: <code>\*</code> - {string} A string representing the flattened request URL.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| res | <code>Response</code> | A Response object |
 
 <a name="requestMatcher"></a>
 

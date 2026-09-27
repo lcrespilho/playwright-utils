@@ -1,36 +1,15 @@
 import type { Request, Response, BrowserContext, Page, Locator } from '@playwright/test'
+import { flatRequestUrl } from './flatRequestUrl'
+import { flatResponseUrl } from './flatResponseUrl'
 import axios from 'axios'
+export { waitForPageOrWorkerRequest } from './waitForPageOrWorkerRequest'
 
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
  *************************************************************/
 
-type RequestLike = { url: (() => string) | string; postData?: (() => string | null) | string }
-
-/**
- * Returns a flattened request URL by combining the URL and postData parameters of the given Request-like object.
- *
- * @param {RequestLike} req The Request-like object containing the URL and postData
- * @return {*}  {string} A string representing the flattened request URL
- */
-export const flatRequestUrl = (req: RequestLike): string => {
-  const url = typeof req.url === 'function' ? req.url() : req.url
-  const body = typeof req.postData === 'function' ? (req.postData() ?? '') : (req.postData ?? '')
-  if (!body) return url
-  const flatUrl = `${url}${url.includes('?') ? '&' : '?'}${body}`
-  return flatUrl
-    .replace(/\r\n|\n|\r/g, '&')
-    .replace(/&&/g, '&')
-    .replace(/&$/g, '')
-}
-/**
- * Returns a flattened request URL from Response object, by combining the URL and postData
- * parameters of the given Response's Request object.
- *
- * @param {Response} res A Response object
- * @return {*}  {string} A string representing the flattened request URL.
- */
-export const flatResponseUrl = (res: Response): string => flatRequestUrl(res.request())
+export { flatRequestUrl }
+export { flatResponseUrl }
 
 /**
  * Accepts a pattern, and returns a function that returns true if a

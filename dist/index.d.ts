@@ -1,26 +1,12 @@
 import type { Request, Response, BrowserContext, Page, Locator } from '@playwright/test';
+import { flatRequestUrl } from './flatRequestUrl';
+import { flatResponseUrl } from './flatResponseUrl';
+export { waitForPageOrWorkerRequest } from './waitForPageOrWorkerRequest';
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
  *************************************************************/
-type RequestLike = {
-    url: (() => string) | string;
-    postData?: (() => string | null) | string;
-};
-/**
- * Returns a flattened request URL by combining the URL and postData parameters of the given Request-like object.
- *
- * @param {RequestLike} req The Request-like object containing the URL and postData
- * @return {*}  {string} A string representing the flattened request URL
- */
-export declare const flatRequestUrl: (req: RequestLike) => string;
-/**
- * Returns a flattened request URL from Response object, by combining the URL and postData
- * parameters of the given Response's Request object.
- *
- * @param {Response} res A Response object
- * @return {*}  {string} A string representing the flattened request URL.
- */
-export declare const flatResponseUrl: (res: Response) => string;
+export { flatRequestUrl };
+export { flatResponseUrl };
 /**
  * Accepts a pattern, and returns a function that returns true if a
  * request is matched by the pattern.
@@ -276,4 +262,3 @@ export declare function waitForFacebookPixel({ page, eventName, pixelId, eventId
  * ```
  */
 export declare function highlightLocator(locator: Locator): Promise<void>;
-export {};

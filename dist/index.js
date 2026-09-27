@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatResponseUrl = exports.flatRequestUrl = void 0;
+exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatResponseUrl = exports.flatRequestUrl = exports.waitForPageOrWorkerRequest = void 0;
 exports.saveJsonToGlitch = saveJsonToGlitch;
 exports.fetchJsonFromGlitch = fetchJsonFromGlitch;
 exports.saveSessionCookies = saveSessionCookies;
@@ -14,47 +14,26 @@ exports.scrollToBottom = scrollToBottom;
 exports.waitForWebToServer = waitForWebToServer;
 exports.waitForFacebookPixel = waitForFacebookPixel;
 exports.highlightLocator = highlightLocator;
+const flatRequestUrl_1 = require("./flatRequestUrl");
+Object.defineProperty(exports, "flatRequestUrl", { enumerable: true, get: function () { return flatRequestUrl_1.flatRequestUrl; } });
+const flatResponseUrl_1 = require("./flatResponseUrl");
+Object.defineProperty(exports, "flatResponseUrl", { enumerable: true, get: function () { return flatResponseUrl_1.flatResponseUrl; } });
 const axios_1 = __importDefault(require("axios"));
-/**
- * Returns a flattened request URL by combining the URL and postData parameters of the given Request-like object.
- *
- * @param {RequestLike} req The Request-like object containing the URL and postData
- * @return {*}  {string} A string representing the flattened request URL
- */
-const flatRequestUrl = (req) => {
-    const url = typeof req.url === 'function' ? req.url() : req.url;
-    const body = typeof req.postData === 'function' ? (req.postData() ?? '') : (req.postData ?? '');
-    if (!body)
-        return url;
-    const flatUrl = `${url}${url.includes('?') ? '&' : '?'}${body}`;
-    return flatUrl
-        .replace(/\r\n|\n|\r/g, '&')
-        .replace(/&&/g, '&')
-        .replace(/&$/g, '');
-};
-exports.flatRequestUrl = flatRequestUrl;
-/**
- * Returns a flattened request URL from Response object, by combining the URL and postData
- * parameters of the given Response's Request object.
- *
- * @param {Response} res A Response object
- * @return {*}  {string} A string representing the flattened request URL.
- */
-const flatResponseUrl = (res) => (0, exports.flatRequestUrl)(res.request());
-exports.flatResponseUrl = flatResponseUrl;
+var waitForPageOrWorkerRequest_1 = require("./waitForPageOrWorkerRequest");
+Object.defineProperty(exports, "waitForPageOrWorkerRequest", { enumerable: true, get: function () { return waitForPageOrWorkerRequest_1.waitForPageOrWorkerRequest; } });
 /**
  * Accepts a pattern, and returns a function that returns true if a
  * request is matched by the pattern.
  * @param pattern - pattern to match the request URL.
  */
-const requestMatcher = (pattern) => (req) => typeof pattern === 'string' ? (0, exports.flatRequestUrl)(req).includes(pattern) : pattern.test((0, exports.flatRequestUrl)(req));
+const requestMatcher = (pattern) => (req) => typeof pattern === 'string' ? (0, flatRequestUrl_1.flatRequestUrl)(req).includes(pattern) : pattern.test((0, flatRequestUrl_1.flatRequestUrl)(req));
 exports.requestMatcher = requestMatcher;
 /**
  * Accepts a pattern, and returns a function that returns true if a
  * response is matched by the pattern.
  * @param pattern - pattern to match the response URL.
  */
-const responseMatcher = (pattern) => (res) => typeof pattern === 'string' ? (0, exports.flatResponseUrl)(res).includes(pattern) : pattern.test((0, exports.flatResponseUrl)(res));
+const responseMatcher = (pattern) => (res) => typeof pattern === 'string' ? (0, flatResponseUrl_1.flatResponseUrl)(res).includes(pattern) : pattern.test((0, flatResponseUrl_1.flatResponseUrl)(res));
 exports.responseMatcher = responseMatcher;
 /**
  * Accepts a pattern and a callback function, and returns a function that
