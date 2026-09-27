@@ -2,7 +2,7 @@ import type { Request, Response, BrowserContext, Page, Locator } from '@playwrig
 import { flatRequestUrl } from './flatRequestUrl'
 import { flatResponseUrl } from './flatResponseUrl'
 import axios from 'axios'
-export { waitForPageOrWorkerRequest } from './waitForPageOrWorkerRequest'
+export { waitForPageOrWorkerRequest, initWorkerCDPSession } from './waitForPageOrWorkerRequest'
 
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************

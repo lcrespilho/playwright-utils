@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.initWorkerCDPSession = initWorkerCDPSession;
 exports.waitForPageOrWorkerRequest = waitForPageOrWorkerRequest;
 const flatRequestUrl_1 = require("./flatRequestUrl");
 /**
@@ -10,6 +11,14 @@ const flatRequestUrl_1 = require("./flatRequestUrl");
  * seja executada apenas uma vez por página durante os testes.
  */
 const cdpSessionsByPage = new WeakMap();
+/**
+ * Inicializa previamente a sessão CDP e configuração de auto-attach para a página.
+ * Útil para ser chamado antes de `page.goto` em cenários com cache HTTP ativo,
+ * garantindo que o CDP já esteja interceptando antes do primeiro pacote da navegação.
+ */
+async function initWorkerCDPSession(page) {
+    return getOrCreateWorkerCDPSession(page);
+}
 /**
  * Obtém uma sessão CDP existente ou inicializa uma nova para a página informada.
  *
@@ -25,16 +34,24 @@ async function getOrCreateWorkerCDPSession(page) {
     if (!sessionPromise) {
         sessionPromise = (async () => {
             const client = await page.context().newCDPSession(page);
-            // Anexa automaticamente a Service Workers, Workers e Shared Workers
-            await client.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: false });
-            client.on('Target.attachedToTarget', async ({ sessionId, targetInfo }) => {
+            // Anexa automaticamente a Service Workers, Workers e Shared Workers.
+            // O listener DEVE ser registrado antes do setAutoAttach para capturar workers já existentes (ex: do cache).
+            client.on('Target.attachedToTarget', async ({ sessionId, targetInfo, waitingForDebugger }) => {
                 if (['service_worker', 'worker', 'shared_worker'].includes(targetInfo.type)) {
                     await client.send('Target.sendMessageToTarget', {
                         sessionId,
                         message: JSON.stringify({ id: 1, method: 'Network.enable' }),
                     });
+                    if (waitingForDebugger) {
+                        await client.send('Target.sendMessageToTarget', {
+                            sessionId,
+                            message: JSON.stringify({ id: 2, method: 'Runtime.runIfWaitingForDebugger' }),
+                        });
+                    }
                 }
             });
+            // waitForDebuggerOnStart: true garante que workers novos não disparem requisições antes do Network.enable estar ativo
+            await client.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: false });
             // Limpeza da sessão caso a página feche antes do término do teste
             page.once('close', () => {
                 cdpSessionsByPage.delete(page);

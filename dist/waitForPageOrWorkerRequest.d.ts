@@ -1,10 +1,16 @@
-import type { Page, Request } from '@playwright/test';
+import type { Page, Request, CDPSession } from '@playwright/test';
 interface TargetRequest {
     url: string;
     method: string;
     /** Payload enviado no corpo da requisição, se houver. */
     postData?: string;
 }
+/**
+ * Inicializa previamente a sessão CDP e configuração de auto-attach para a página.
+ * Útil para ser chamado antes de `page.goto` em cenários com cache HTTP ativo,
+ * garantindo que o CDP já esteja interceptando antes do primeiro pacote da navegação.
+ */
+export declare function initWorkerCDPSession(page: Page): Promise<CDPSession>;
 /**
  * Aguarda por uma requisição de rede que coincida com o padrão especificado,
  * monitorando simultaneamente a página principal e background workers (Service Workers,

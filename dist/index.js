@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatResponseUrl = exports.flatRequestUrl = exports.waitForPageOrWorkerRequest = void 0;
+exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatResponseUrl = exports.flatRequestUrl = exports.initWorkerCDPSession = exports.waitForPageOrWorkerRequest = void 0;
 exports.saveJsonToGlitch = saveJsonToGlitch;
 exports.fetchJsonFromGlitch = fetchJsonFromGlitch;
 exports.saveSessionCookies = saveSessionCookies;
@@ -21,6 +21,7 @@ Object.defineProperty(exports, "flatResponseUrl", { enumerable: true, get: funct
 const axios_1 = __importDefault(require("axios"));
 var waitForPageOrWorkerRequest_1 = require("./waitForPageOrWorkerRequest");
 Object.defineProperty(exports, "waitForPageOrWorkerRequest", { enumerable: true, get: function () { return waitForPageOrWorkerRequest_1.waitForPageOrWorkerRequest; } });
+Object.defineProperty(exports, "initWorkerCDPSession", { enumerable: true, get: function () { return waitForPageOrWorkerRequest_1.initWorkerCDPSession; } });
 /**
  * Accepts a pattern, and returns a function that returns true if a
  * request is matched by the pattern.

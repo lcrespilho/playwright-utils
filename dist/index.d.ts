@@ -1,7 +1,7 @@
 import type { Request, Response, BrowserContext, Page, Locator } from '@playwright/test';
 import { flatRequestUrl } from './flatRequestUrl';
 import { flatResponseUrl } from './flatResponseUrl';
-export { waitForPageOrWorkerRequest } from './waitForPageOrWorkerRequest';
+export { waitForPageOrWorkerRequest, initWorkerCDPSession } from './waitForPageOrWorkerRequest';
 /*************************************************************
  ********* Manipulação de URLs / Requests - begin ************
  *************************************************************/

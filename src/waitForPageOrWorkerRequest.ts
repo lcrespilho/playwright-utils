@@ -29,6 +29,15 @@ interface TargetMessage {
 const cdpSessionsByPage = new WeakMap<Page, Promise<CDPSession>>()
 
 /**
+ * Inicializa previamente a sessão CDP e configuração de auto-attach para a página.
+ * Útil para ser chamado antes de `page.goto` em cenários com cache HTTP ativo,
+ * garantindo que o CDP já esteja interceptando antes do primeiro pacote da navegação.
+ */
+export async function initWorkerCDPSession(page: Page): Promise<CDPSession> {
+  return getOrCreateWorkerCDPSession(page)
+}
+
+/**
  * Obtém uma sessão CDP existente ou inicializa uma nova para a página informada.
  *
  * Configura o auto-attach para capturar Service Workers, Web Workers e Shared Workers,
@@ -45,16 +54,25 @@ async function getOrCreateWorkerCDPSession(page: Page): Promise<CDPSession> {
     sessionPromise = (async () => {
       const client = await page.context().newCDPSession(page)
 
-      // Anexa automaticamente a Service Workers, Workers e Shared Workers
-      await client.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: false })
-      client.on('Target.attachedToTarget', async ({ sessionId, targetInfo }) => {
+      // Anexa automaticamente a Service Workers, Workers e Shared Workers.
+      // O listener DEVE ser registrado antes do setAutoAttach para capturar workers já existentes (ex: do cache).
+      client.on('Target.attachedToTarget', async ({ sessionId, targetInfo, waitingForDebugger }) => {
         if (['service_worker', 'worker', 'shared_worker'].includes(targetInfo.type)) {
           await client.send('Target.sendMessageToTarget', {
             sessionId,
             message: JSON.stringify({ id: 1, method: 'Network.enable' }),
           })
+          if (waitingForDebugger) {
+            await client.send('Target.sendMessageToTarget', {
+              sessionId,
+              message: JSON.stringify({ id: 2, method: 'Runtime.runIfWaitingForDebugger' }),
+            })
+          }
         }
       })
+
+      // waitForDebuggerOnStart: true garante que workers novos não disparem requisições antes do Network.enable estar ativo
+      await client.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: false })
 
       // Limpeza da sessão caso a página feche antes do término do teste
       page.once('close', () => {
@@ -158,4 +176,3 @@ export async function waitForPageOrWorkerRequest(
     client.on('Target.receivedMessageFromTarget', workerListener)
   })
 }
-
