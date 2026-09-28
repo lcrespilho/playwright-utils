@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     /* Padrões Modernos */
-    "target": "ES2025", // TS 6.0 recomenda targets datados ou ESNext
+    "target": "esnext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext", // Agora obrigatório ser explícito com NodeNext
 
     /* Configurações de Emissão */
     "outDir": "./dist",
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "declaration": true,
     "rootDir": "./src",
     "skipLibCheck": true,

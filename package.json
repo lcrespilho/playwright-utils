@@ -21,7 +21,8 @@
     "publish-dev-major": "npm version premajor --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
     "publish-dev-prerelease": "npm version prerelease --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
     "jsdoc2markdown": "jsdoc2md --files dist/index.js > README.md && cat README.leo >> README.md",
-    "pack": "tsc && npm pack"
+    "pack": "tsc && npm pack",
+    "test": "npm run build && playwright test"
   },
   "keywords": [],
   "author": "",
@@ -30,11 +31,16 @@
     "axios": "^1.19.0"
   },
   "devDependencies": {
+    "@lcrespilho/playwright-fixtures": "^7.0.0",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^26.2.0",
     "jsdoc-to-markdown": "^9.1.3",
     "typescript": "^7.0.2"
   },
   "peerDependencies": {
-    "@playwright/test": "^1.62.1"
+    "@playwright/test": "^1.63.0"
+  },
+  "allowScripts": {
+    "puppeteer@25.12.0": true
   }
 }
