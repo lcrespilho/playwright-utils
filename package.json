@@ -1,6 +1,6 @@
 {
   "name": "@lcrespilho/playwright-utils",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Coleção de funções utilitárias que utilizo frequentemente com o Playwright",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "publish-dev-prerelease": "npm version prerelease --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
     "jsdoc2markdown": "jsdoc2md --files dist/index.js > README.md && cat README.leo >> README.md",
     "pack": "tsc && npm pack",
-    "test": "npm run build && playwright test"
+    "test": "playwright test"
   },
   "keywords": [],
   "author": "",
