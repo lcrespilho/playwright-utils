@@ -1,6 +1,6 @@
 {
   "name": "@lcrespilho/playwright-utils",
-  "version": "3.3.0",
+  "version": "3.5.0",
   "description": "Coleção de funções utilitárias que utilizo frequentemente com o Playwright",
   "repository": {
     "type": "git",
@@ -13,23 +13,20 @@
   ],
   "scripts": {
     "build": "tsc",
-    "publish-prod-patch": "npm version patch --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag latest",
-    "publish-prod-minor": "npm version minor --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag latest",
-    "publish-prod-major": "npm version major --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag latest",
-    "publish-dev-patch": "npm version prepatch --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
-    "publish-dev-minor": "npm version preminor --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
-    "publish-dev-major": "npm version premajor --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
-    "publish-dev-prerelease": "npm version prerelease --preid dev --no-commit-hooks --no-git-tag-version && tsc && npm publish --access public --tag next",
-    "jsdoc2markdown": "jsdoc2md --files dist/index.js > README.md && cat README.leo >> README.md",
-    "pack": "tsc && npm pack",
+    "publish-prod-patch": "npm version patch --no-commit-hooks --no-git-tag-version && npm run build && npm run jsdoc2markdown && npm publish --access public --tag latest",
+    "publish-prod-minor": "npm version minor --no-commit-hooks --no-git-tag-version && npm run build && npm run jsdoc2markdown && npm publish --access public --tag latest",
+    "publish-prod-major": "npm version major --no-commit-hooks --no-git-tag-version && npm run build && npm run jsdoc2markdown && npm publish --access public --tag latest",
+    "publish-dev-patch": "npm version prepatch --preid dev --no-commit-hooks --no-git-tag-version && npm run build && npm run jsdoc2markdown && npm publish --access public --tag next",
+    "publish-dev-minor": "npm version preminor --preid dev --no-commit-hooks --no-git-tag-version && npm run build && npm run jsdoc2markdown && npm publish --access public --tag next",
+    "publish-dev-major": "npm version premajor --preid dev --no-commit-hooks --no-git-tag-version && npm run build && npm run jsdoc2markdown && npm publish --access public --tag next",
+    "publish-dev-prerelease": "npm version prerelease --preid dev --no-commit-hooks --no-git-tag-version && npm run build && npm run jsdoc2markdown && npm publish --access public --tag next",
+    "jsdoc2markdown": "npm run build && jsdoc2md --files dist/*.js > README.md && cat README.leo >> README.md",
+    "pack": "npm run build && npm pack",
     "test": "playwright test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "axios": "^1.19.0"
-  },
   "devDependencies": {
     "@lcrespilho/playwright-fixtures": "^7.0.0",
     "@playwright/test": "^1.63.0",
