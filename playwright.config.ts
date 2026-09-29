@@ -3,6 +3,9 @@ import { FixturesOptions } from '@lcrespilho/playwright-fixtures'
 
 export default defineConfig<FixturesOptions>({
   testDir: './src',
+  use: {
+    trace: 'off',
+  },
 
   reporter: 'list',
   projects: [

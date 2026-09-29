@@ -1,0 +1,286 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.responseMatcherCb = exports.requestMatcherCb = exports.responseMatcher = exports.requestMatcher = exports.flatResponseUrl = exports.flatRequestUrl = void 0;
+exports.saveJsonToGlitch = saveJsonToGlitch;
+exports.fetchJsonFromGlitch = fetchJsonFromGlitch;
+exports.saveSessionCookies = saveSessionCookies;
+exports.restoreSessionCookies = restoreSessionCookies;
+exports.previewGTM = previewGTM;
+exports.enableGADebug = enableGADebug;
+exports.scrollToBottom = scrollToBottom;
+exports.waitForWebToServer = waitForWebToServer;
+exports.waitForFacebookPixel = waitForFacebookPixel;
+exports.highlightLocator = highlightLocator;
+const flatRequestUrl_1 = require("./flatRequestUrl");
+Object.defineProperty(exports, "flatRequestUrl", { enumerable: true, get: function () { return flatRequestUrl_1.flatRequestUrl; } });
+const flatResponseUrl_1 = require("./flatResponseUrl");
+Object.defineProperty(exports, "flatResponseUrl", { enumerable: true, get: function () { return flatResponseUrl_1.flatResponseUrl; } });
+const axios_1 = __importDefault(require("axios"));
+/**
+ * Accepts a pattern, and returns a function that returns true if a
+ * request is matched by the pattern.
+ * @param pattern - pattern to match the request URL.
+ */
+const requestMatcher = (pattern) => (req) => typeof pattern === 'string' ? (0, flatRequestUrl_1.flatRequestUrl)(req).includes(pattern) : pattern.test((0, flatRequestUrl_1.flatRequestUrl)(req));
+exports.requestMatcher = requestMatcher;
+/**
+ * Accepts a pattern, and returns a function that returns true if a
+ * response is matched by the pattern.
+ * @param pattern - pattern to match the response URL.
+ */
+const responseMatcher = (pattern) => (res) => typeof pattern === 'string' ? (0, flatResponseUrl_1.flatResponseUrl)(res).includes(pattern) : pattern.test((0, flatResponseUrl_1.flatResponseUrl)(res));
+exports.responseMatcher = responseMatcher;
+/**
+ * Accepts a pattern and a callback function, and returns a function that
+ * returns true if a request is matched by the pattern, and executes the
+ * callback with the request object as parameter.
+ * @param pattern - pattern to match the request URL.
+ * @param cb - Callback function that will be executed after if the request is matched.
+ */
+const requestMatcherCb = (pattern, cb) => (req) => {
+    if ((0, exports.requestMatcher)(pattern)(req)) {
+        try {
+            cb(req);
+        }
+        catch (e) { }
+        return true;
+    }
+    else {
+        return false;
+    }
+};
+exports.requestMatcherCb = requestMatcherCb;
+/**
+ * Accepts a pattern and a callback function, and returns a function that
+ * returns true if a response is matched by the pattern, and executes the
+ * callback with the response object as parameter.
+ * @param pattern - Pattern to match the request URL.
+ * @param cb - Callback function that will be executed after if the request is matched.
+ */
+const responseMatcherCb = (pattern, cb) => (res) => {
+    if ((0, exports.responseMatcher)(pattern)(res)) {
+        try {
+            cb(res);
+        }
+        catch (e) { }
+        return true;
+    }
+    else {
+        return false;
+    }
+};
+exports.responseMatcherCb = responseMatcherCb;
+/*************************************************************
+ *********** Manipulação de URLs / Requests - end ************
+ *************************************************************/
+/*************************************************************
+ ******* Guarda/restaura cookies no Glitch - begin ***********
+ *************************************************************/
+async function saveJsonToGlitch(key, data, expires) {
+    await axios_1.default.post(`https://lourenco-json-storage.glitch.me/${key}`, {
+        data,
+        expires,
+    });
+}
+async function fetchJsonFromGlitch(key) {
+    return (await axios_1.default.get(`https://lourenco-json-storage.glitch.me/${key}`)).data;
+}
+/**
+ * Salva os cookies do contexto no Glitch.
+ *
+ * @export
+ * @param {BrowserContext} context - Contexto do browser.
+ * @param {string} key - Nome da sessão no Glitch, usado para resgatar a sessão.
+ * @param {number} [expires] - tempo em s para guardar a sessão remotamente. Default 48h.
+ * @example
+ * ```typescript
+ * import { saveSessionCookies, restoreSessionCookies } from '../../utils/helpers';
+ * // antes de começar o teste, restaura a sessão anterior, se houver.
+ * test.beforeEach(async ({ context }) => {
+ *   await restoreSessionCookies(context, 'session-123');
+ * });
+ * // após o teste, salva a sessão atual, para que possa ser restaurada posteriormente.
+ * test.afterEach(async ({ context }) => {
+ *   await saveSessionCookies(context, 'session-123', 2 * 60 * 60);
+ * });
+ * ```
+ */
+async function saveSessionCookies(context, key, expires) {
+    const cookies = await context.cookies();
+    if (cookies.length) {
+        await saveJsonToGlitch(key, cookies, expires);
+    }
+}
+/**
+ * Restaura, no contexto do browser, os cookies previamente salvos no Glitch.
+ *
+ * @export
+ * @param {BrowserContext} context - Contexto do browser.
+ * @param {string} key - Nome da sessão no Glitch, usado para resgatar a sessão.
+ * @example
+ * ```typescript
+ * import { saveSessionCookies, restoreSessionCookies } from '../../utils/helpers';
+ * // antes de começar o teste, restaura a sessão anterior, se houver.
+ * test.beforeEach(async ({ context }) => {
+ *   await restoreSessionCookies(context, 'session-123');
+ * });
+ * // após o teste, salva a sessão atual, para que possa ser restaurada posteriormente.
+ * test.afterEach(async ({ context }) => {
+ *   await saveSessionCookies(context, 'session-123', 2 * 60 * 60);
+ * });
+ * ```
+ */
+async function restoreSessionCookies(context, key) {
+    const cookies = await fetchJsonFromGlitch(key);
+    if (cookies) {
+        await context.addCookies(cookies);
+        return true;
+    }
+    return false;
+}
+/*************************************************************
+ ********* Guarda/restaura cookies no Glitch - end ***********
+ *************************************************************/
+/**
+ * Realiza preview do GTM. Pode ser utilizada em `test.beforeEach` ou `test`.
+ *
+ * @export
+ * @param {Page | BrowserContext} pageOrContext - Contexto ou página do browser.
+ * @param {string} tagAssistantUrl - url completa de preview do Tag Assistant. Ex: https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987
+ * @example
+ * ```typescript
+ * test.beforeEach(async ({ context }) => {
+ *   await previewGTM(context, 'https://tagassistant.google.com/?authuser=8&hl=en&utm_source=gtm#/?source=TAG_MANAGER&id=GTM-123123&gtm_auth=cDqGMWuJkUq73urprdYOAw&gtm_preview=env-869&cb=8635696129626987');
+ * });
+ * ```
+ */
+async function previewGTM(pageOrContext, tagAssistantUrl) {
+    let taUrl = new URL(tagAssistantUrl.replace(/\/\?.*?#\/\?/, '/?'));
+    const containerId = taUrl.searchParams.get('id');
+    const gtm_auth = taUrl.searchParams.get('gtm_auth');
+    const gtm_preview = taUrl.searchParams.get('gtm_preview');
+    await pageOrContext.route(new RegExp(`gtm.js\\?id=${containerId}(?!.*gtm_auth=)(?!.*gtm_preview=)`), (route, request) => {
+        const requestHostname = new URL(request.url()).hostname;
+        route.continue({
+            url: `https://${requestHostname}/gtm.js?id=${containerId}&gtm_auth=${gtm_auth}&gtm_preview=${gtm_preview}&cb=${Date.now()}`,
+        });
+    });
+}
+/**
+ * Simula a extensão Google Analytics Debugger (https://chrome.google.com/webstore/detail/jnkmfdileelhofjcijamephohjechhna),
+ * habilitando debug GA4 (gtag).
+ */
+async function enableGADebug(context) {
+    await context.route(/\/gtag\/(js|destination)(?!.*dbg=1)/, async (route, request) => {
+        const url = new URL(request.url());
+        url.searchParams.set('dbg', '1');
+        url.hostname = 'www.googletagmanager.com';
+        route.continue({ url: url.href });
+    });
+    // Debug de gtag
+    await context.addCookies([
+        {
+            name: 'gtm_debug',
+            value: 'LOG=x',
+            url: 'https://www.googletagmanager.com/',
+            sameSite: 'None',
+            secure: true,
+        },
+    ]);
+}
+/**
+ * Realiza scroll até o fundo da página, suavemente.
+ */
+async function scrollToBottom({ page, timeToWaitAfterScroll = 0, returnToTop = true, timeout = Infinity, }) {
+    const t0 = Date.now();
+    while (Date.now() - t0 < timeout &&
+        (await page.evaluate('scrollY + innerHeight + 20 < document.body.scrollHeight'))) {
+        await page.evaluate(() => scrollBy({ behavior: 'smooth', top: 1.5 * innerHeight }));
+        await page.waitForTimeout(700);
+    }
+    if (returnToTop)
+        await page.evaluate(() => scrollTo({ top: 0, behavior: 'smooth' }));
+    if (timeToWaitAfterScroll > 0)
+        await page.waitForTimeout(timeToWaitAfterScroll);
+}
+/**
+ * Waits for a specific Web To Server request to be made and returns its details.
+ *
+ * @export
+ * @throws {Error} Throws an error if events_received is not equal to 1
+ *
+ * @example
+ * ```typescript
+ * const { event_data, event_id, requestUrl } = await waitForWebToServer({
+ *   page,
+ *   eventName: 'page_view',
+ *   timeout: 15000
+ * })
+ * console.log(event_id, requestUrl)
+ * ```
+ */
+async function waitForWebToServer({ page, eventName = '', eventId = '', timeout, }) {
+    let re = new RegExp(`/web-to-server\\?en=${eventName || '.*?'}&eid=${eventId}`);
+    let request;
+    if (timeout) {
+        request = await page.waitForRequest(request => re.test(request.url()), { timeout });
+    }
+    else {
+        request = await page.waitForRequest(request => re.test(request.url()));
+    }
+    const responseBody = await (await request.response())?.json();
+    let { en: event_name, eid: event_id, ed: event_data_string, } = Object.fromEntries(new URL(request.url()).searchParams.entries());
+    const event_data = JSON.parse(Buffer.from(event_data_string, 'base64').toString('utf8'));
+    if (responseBody.response.events_received !== 1)
+        throw new Error(JSON.stringify(responseBody.response));
+    return { event_name, event_id, event_data, responseBody, requestUrl: request.url() };
+}
+/**
+ * Waits for a specific Facebook Pixel request to be make and returns its details.
+ *
+ * @export
+ *
+ * @example
+ * ```typescript
+ * const { event_id, requestUrl } = await waitForFacebookPixel({
+ *   page,
+ *   eventName: 'PageView',
+ *   pixelId: '123123123123',
+ *   timeout: 15000
+ * })
+ * console.log(event_id, requestUrl)
+ * ```
+ */
+async function waitForFacebookPixel({ page, eventName = '', pixelId = '', eventId = '', timeout, }) {
+    let re = new RegExp(`facebook.com/tr/\\?id=${pixelId || '.*?'}&ev=${eventName}&.*&eid=${eventId}`);
+    let request;
+    if (timeout) {
+        request = await page.waitForRequest(request => re.test(request.url()), { timeout });
+    }
+    else {
+        request = await page.waitForRequest(request => re.test(request.url()));
+    }
+    let { eid: event_id, ev: event_name, id: pixel_id, } = Object.fromEntries(new URL(request.url()).searchParams.entries());
+    return { event_name, event_id, pixel_id, requestUrl: request.url() };
+}
+/**
+ * Highlights a locator on the page.
+ * @param locator The locator to highlight.
+ * @export
+ * @example
+ * ```typescript
+ * const locator = page.getByRole('button', { name: 'Click Me' })
+ * await highlightLocator(locator)
+ * ```
+ */
+async function highlightLocator(locator) {
+    await locator.evaluate(element => {
+        element.style.border = '4px solid red';
+        element.style.boxShadow = '0 0 20px 10px rgba(255, 0, 0, 0.5)';
+        element.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
+    });
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7OztBQUNBLHFEQUFpRDsrRkFBeEMsK0JBQWM7QUFDdkIsdURBQW1EO2dHQUExQyxpQ0FBZTtBQUN4QixrREFBeUI7QUFTekI7Ozs7R0FJRztBQUNJLE1BQU0sY0FBYyxHQUFHLENBQUMsT0FBd0IsRUFBRSxFQUFFLENBQUMsQ0FBQyxHQUFZLEVBQUUsRUFBRSxDQUMzRSxPQUFPLE9BQU8sS0FBSyxRQUFRLENBQUMsQ0FBQyxDQUFDLElBQUEsK0JBQWMsRUFBQyxHQUFHLENBQUMsQ0FBQyxRQUFRLENBQUMsT0FBTyxDQUFDLENBQUMsQ0FBQyxDQUFDLE9BQU8sQ0FBQyxJQUFJLENBQUMsSUFBQSwrQkFBYyxFQUFDLEdBQUcsQ0FBQyxDQUFDLENBQUE7QUFENUYsUUFBQSxjQUFjLEdBQWQsY0FBYyxDQUM4RTtBQUV6Rzs7OztHQUlHO0FBQ0ksTUFBTSxlQUFlLEdBQUcsQ0FBQyxPQUF3QixFQUFFLEVBQUUsQ0FBQyxDQUFDLEdBQWEsRUFBRSxFQUFFLENBQzdFLE9BQU8sT0FBTyxLQUFLLFFBQVEsQ0FBQyxDQUFDLENBQUMsSUFBQSxpQ0FBZSxFQUFDLEdBQUcsQ0FBQyxDQUFDLFFBQVEsQ0FBQyxPQUFPLENBQUMsQ0FBQyxDQUFDLENBQUMsT0FBTyxDQUFDLElBQUksQ0FBQyxJQUFBLGlDQUFlLEVBQUMsR0FBRyxDQUFDLENBQUMsQ0FBQTtBQUQ5RixRQUFBLGVBQWUsR0FBZixlQUFlLENBQytFO0FBRTNHOzs7Ozs7R0FNRztBQUNJLE1BQU0sZ0JBQWdCLEdBQUcsQ0FBQyxPQUF3QixFQUFFLEVBQTBCLEVBQUUsRUFBRSxDQUFDLENBQUMsR0FBWSxFQUFFLEVBQUU7SUFDekcsSUFBSSxJQUFBLFFBQUEsY0FBYyxFQUFDLE9BQU8sQ0FBQyxDQUFDLEdBQUcsQ0FBQyxFQUFFLENBQUM7UUFDakMsSUFB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
