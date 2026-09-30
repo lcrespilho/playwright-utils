@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 import { FixturesOptions } from '@lcrespilho/playwright-fixtures'
 
 export default defineConfig<FixturesOptions>({
-  testDir: './src',
+  testDir: './tests',
   use: {
     trace: 'off',
   },
@@ -11,6 +11,7 @@ export default defineConfig<FixturesOptions>({
   projects: [
     {
       // Para usar esse projeto, utilize `import { test, expect } from '@lcrespilho/playwright-fixtures'`
+      // E suba um browser com CDP na porta 9222
       name: 'cdp',
       use: {
         browserType: 'cdp',
