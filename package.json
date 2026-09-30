@@ -28,7 +28,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@lcrespilho/playwright-fixtures": "^7.0.0",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.2.0",
     "jsdoc-to-markdown": "^9.1.3",
